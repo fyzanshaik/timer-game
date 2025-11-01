@@ -1,6 +1,8 @@
-import { useRef, forwardRef, useImperativeHandle } from "react";
+import { useRef, forwardRef, useImperativeHandle, useState } from "react";
 import { createPortal } from "react-dom";
 import { useUpdateScore } from "../hooks/useScore";
+import { ParticleEffect } from "./ParticleEffect";
+import { useHaptics } from "../hooks/useHaptics";
 import type { TimerScoreKey } from "@timer-game/types";
 
 export interface ResultModalHandle {
@@ -17,49 +19,69 @@ interface ResultModalProps {
   userName: string;
 }
 
-export const ResultModal = forwardRef<ResultModalHandle, ResultModalProps>(
-  ({ targetTime, remainingTime, handleReset, userId, setUserHighScore, userHighScore, userName }, ref) => {
-    const dialog = useRef<HTMLDialogElement | null>(null);
-    const { mutate: updateScore } = useUpdateScore();
+export const ResultModal = forwardRef<ResultModalHandle, ResultModalProps>(function ResultModal(
+  { targetTime, remainingTime, handleReset, userId, setUserHighScore, userHighScore, userName },
+  ref
+) {
+  const dialog = useRef<HTMLDialogElement | null>(null);
+  const { mutate: updateScore } = useUpdateScore();
+  const { vibrate } = useHaptics();
+  const [showParticles, setShowParticles] = useState(false);
+  const [particleType, setParticleType] = useState<"success" | "failure" | "celebration">("success");
 
-    const userLost = remainingTime <= 0;
-    const formattedTime = (remainingTime / 1000).toFixed(2);
-    const formattedTime8base = (remainingTime / 1000).toFixed(5);
+  const userLost = remainingTime <= 0;
+  const formattedTime = (remainingTime / 1000).toFixed(2);
+  const formattedTime8base = (remainingTime / 1000).toFixed(5);
 
-    const score = Math.round((1 - remainingTime / (targetTime * 1000)) * 100);
+  const score = Math.round((1 - remainingTime / (targetTime * 1000)) * 100);
 
-    useImperativeHandle(ref, () => ({
-      open() {
-        dialog.current?.showModal();
-        handleScoreUpdate();
-      },
-    }));
+  useImperativeHandle(ref, () => ({
+    open() {
+      dialog.current?.showModal();
+      handleScoreUpdate();
+    },
+  }));
 
-    const handleScoreUpdate = () => {
-      if (score > userHighScore && !userLost) {
-        setUserHighScore(score);
-        new Audio("/game-bonus.wav").play().catch(() => {});
-        updateScore({
-          userId,
-          userName,
-          timerName: `timer${targetTime}Score` as TimerScoreKey,
-          newScore: score,
-        });
-      } else {
-        new Audio("/space-shooter.wav").play().catch(() => {});
-      }
-    };
+  const handleScoreUpdate = () => {
+    if (userLost) {
+      setParticleType("failure");
+      setShowParticles(true);
+      vibrate("error");
+      new Audio("/space-shooter.wav").play().catch(() => {});
+    } else if (score > userHighScore) {
+      setParticleType("celebration");
+      setShowParticles(true);
+      vibrate("success");
+      setUserHighScore(score);
+      new Audio("/game-bonus.wav").play().catch(() => {});
+      updateScore({
+        userId,
+        userName,
+        timerName: `timer${targetTime}Score` as TimerScoreKey,
+        newScore: score,
+      });
+    } else {
+      setParticleType("success");
+      setShowParticles(true);
+      vibrate("light");
+      new Audio("/space-shooter.wav").play().catch(() => {});
+    }
 
-    return createPortal(
+    setTimeout(() => setShowParticles(false), 3000);
+  };
+
+  return createPortal(
+    <>
+      <ParticleEffect trigger={showParticles} type={particleType} onComplete={() => setShowParticles(false)} />
       <dialog ref={dialog} onClose={handleReset}>
-        <div className="bg-popover text-popover-foreground rounded-xl p-8 max-w-md w-full border-2 border-border [box-shadow:var(--shadow-2xl)]">
+        <div className="bg-popover text-popover-foreground rounded-xl p-8 max-w-md w-full border-2 border-border [box-shadow:var(--shadow-2xl)] animate-scale-in">
           {userLost && (
-            <h2 className="font-['Handjet',monospace] text-5xl font-black uppercase text-destructive mb-5 text-center">
+            <h2 className="font-['Handjet',monospace] text-5xl font-black uppercase text-destructive mb-5 text-center animate-shake">
               💥 Time's Up!
             </h2>
           )}
           {!userLost && score > userHighScore && (
-            <h2 className="font-['Handjet',monospace] text-5xl font-black uppercase text-accent mb-5 text-center">
+            <h2 className="font-['Handjet',monospace] text-5xl font-black uppercase text-accent mb-5 text-center animate-celebration">
               🎉 New Record!
             </h2>
           )}
@@ -87,14 +109,15 @@ export const ResultModal = forwardRef<ResultModalHandle, ResultModalProps>(
           <form method="dialog" onSubmit={handleReset} className="text-right mt-5">
             <button
               type="submit"
-              className="px-7 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-200 border-2 border-primary [box-shadow:var(--shadow-md)] hover:translate-x-0.5 hover:translate-y-0.5"
+              onClick={() => vibrate("light")}
+              className="touch-target px-7 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-200 border-2 border-primary [box-shadow:var(--shadow-md)] hover:translate-x-0.5 hover:translate-y-0.5 button-press hover:scale-105"
             >
               Close
             </button>
           </form>
         </div>
-      </dialog>,
-      document.getElementById("modal") as HTMLElement
-    );
-  }
-);
+      </dialog>
+    </>,
+    document.getElementById("modal") as HTMLElement
+  );
+});

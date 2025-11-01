@@ -32,6 +32,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["dist/**", "build/**", "node_modules/**", "src/routeTree.gen.ts"],
+    ignores: ["dist/**", "build/**", "node_modules/**", "src/routeTree.gen.ts", "eslint.config.js", "vite.config.ts"],
   }
 );

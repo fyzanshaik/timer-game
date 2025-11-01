@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { useLeaderboard } from "../hooks/useLeaderboard";
+import { useHaptics } from "../hooks/useHaptics";
 import type { TimerScoreKey } from "@timer-game/types";
 
 interface LeaderboardProps {
@@ -13,6 +14,7 @@ export interface LeaderboardHandle {
 export const Leaderboard = forwardRef<LeaderboardHandle, LeaderboardProps>(({ timerKey }, ref) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const { data: leaderboardData, isLoading, refetch } = useLeaderboard(timerKey);
+  const { vibrate } = useHaptics();
 
   useImperativeHandle(ref, () => ({
     async fetchAndOpen() {
@@ -25,8 +27,8 @@ export const Leaderboard = forwardRef<LeaderboardHandle, LeaderboardProps>(({ ti
 
   return (
     <dialog ref={dialogRef}>
-      <div className="bg-popover text-popover-foreground rounded-xl p-7 max-w-2xl w-full border-2 border-border [box-shadow:var(--shadow-2xl)]">
-        <h2 className="font-['Handjet',monospace] text-4xl font-black uppercase text-primary text-center mb-6">
+      <div className="bg-popover text-popover-foreground rounded-xl p-4 md:p-7 max-w-2xl w-full border-2 border-border [box-shadow:var(--shadow-2xl)] animate-scale-in mobile-safe-bottom mobile-safe-top">
+        <h2 className="font-['Handjet',monospace] text-3xl md:text-4xl font-black uppercase text-primary text-center mb-4 md:mb-6">
           🏆 {timerName} Leaderboard
         </h2>
         {isLoading ? (
@@ -68,10 +70,11 @@ export const Leaderboard = forwardRef<LeaderboardHandle, LeaderboardProps>(({ ti
           </div>
         )}
 
-        <form method="dialog" className="text-right">
+        <form method="dialog" className="text-right mt-4">
           <button
             type="submit"
-            className="px-7 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-200 border-2 border-primary [box-shadow:var(--shadow-md)] hover:translate-x-0.5 hover:translate-y-0.5"
+            onClick={() => vibrate("light")}
+            className="touch-target px-7 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-200 border-2 border-primary [box-shadow:var(--shadow-md)] hover:translate-x-0.5 hover:translate-y-0.5 button-press hover:scale-105"
           >
             Close
           </button>

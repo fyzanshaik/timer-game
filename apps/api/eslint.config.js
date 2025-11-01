@@ -26,6 +26,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["dist/**", ".wrangler/**", "node_modules/**"],
+    ignores: ["dist/**", ".wrangler/**", "node_modules/**", "eslint.config.js"],
   }
 );

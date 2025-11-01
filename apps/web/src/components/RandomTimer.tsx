@@ -26,8 +26,8 @@ export const RandomTimer: React.FC<RandomTimerProps> = ({ targetTime }) => {
   }, [targetTime]);
 
   return (
-    <div className="my-5 p-8 bg-accent/20 rounded-xl border-2 border-accent [box-shadow:var(--shadow-md)]">
-      <h1 className="font-['Handjet',monospace] text-7xl md:text-8xl font-black text-accent animate-pulse">
+    <div className="my-3 md:my-5 p-5 md:p-8 bg-primary/10 rounded-xl border-2 border-primary [box-shadow:var(--shadow-md)] animate-float">
+      <h1 className="font-['Handjet',monospace] text-6xl md:text-7xl lg:text-8xl font-black text-primary animate-pulse drop-shadow-lg">
         {randNumber}
       </h1>
     </div>
