@@ -11,7 +11,8 @@
     "deploy": "wrangler deploy",
     "build": "tsc",
     "type-check": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:migrate": "wrangler d1 migrations apply timer-game-db"
   },
   "dependencies": {
     "@timer-game/db": "workspace:*",
