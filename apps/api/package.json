@@ -16,7 +16,7 @@
   "dependencies": {
     "@timer-game/db": "workspace:*",
     "@timer-game/types": "workspace:*",
-    "drizzle-orm": "^0.35.3",
+    "drizzle-orm": "^0.44.7",
     "hono": "^4.6.14"
   },
   "devDependencies": {

@@ -9,6 +9,14 @@ const app = new Hono<{ Bindings: Env }>();
 
 const validTimers = ["timer1Score", "timer5Score", "timer10Score", "timer15Score", "timer30Score"] as const;
 
+const timerColumns = {
+  timer1Score: scores.timer1Score,
+  timer5Score: scores.timer5Score,
+  timer10Score: scores.timer10Score,
+  timer15Score: scores.timer15Score,
+  timer30Score: scores.timer30Score,
+} as const;
+
 app.post("/updateScore", async (c) => {
   const body = await c.req.json<UpdateScoreRequest>();
   const { userId, timerName, newScore, userName } = body;
@@ -66,8 +74,10 @@ app.get("/leaderboard/:timerName", async (c) => {
     return c.json(cachedData);
   }
 
+  const orderByColumn = timerColumns[timerName as keyof typeof timerColumns];
+
   const leaderboard = await db.query.scores.findMany({
-    orderBy: [desc(scores[timerName as keyof typeof scores])],
+    orderBy: [desc(orderByColumn)],
     limit: 10,
     with: {
       user: {
