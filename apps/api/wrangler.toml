@@ -1,0 +1,24 @@
+name = "timer-game-api"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "timer-game-db"
+database_id = "be619709-e19f-49b9-adcf-54cd41e7e1c3"
+migrations_dir = "drizzle"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "bf0d3f8ef4e949ec87cfae44a919413b"
+
+[env.production]
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "timer-game-db"
+database_id = "be619709-e19f-49b9-adcf-54cd41e7e1c3"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "bf0d3f8ef4e949ec87cfae44a919413b"
+

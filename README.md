@@ -1,157 +1,86 @@
-# ![emoji](./emojo.png) Almost Timer
- ![Timer Gamer Logo](./logo.png)
+# Almost Timer 🎮
 
-## Overview
-
-**Almost Timer** is an interactive, fast-paced game that tests your reflexes and reaction times! Players compete on leaderboards by scoring points based on how quickly they can react to timed challenges. With real-time updates, fun animations, and a competitive edge, Timer Gamer keeps you engaged as you race against the clock! 🎮
-
-## Table of Contents
-
-- [ Almost Timer](#-almost-timer)
-  - [Overview](#overview)
-  - [Table of Contents](#table-of-contents)
-  - [Game Concept](#game-concept)
-    - [Game Mechanics](#game-mechanics)
-  - [Tech Stack](#tech-stack)
-    - [Frontend](#frontend)
-    - [Backend](#backend)
-  - [Features](#features)
-  - [Installation](#installation)
-    - [Prerequisites](#prerequisites)
-    - [Clone the Repository](#clone-the-repository)
-    - [Frontend Installation](#frontend-installation)
-    - [Backend Installation](#backend-installation)
-  - [Usage](#usage)
-  - [API Reference](#api-reference)
-    - [Base URL](#base-url)
-    - [Endpoints](#endpoints)
-  - [Contributing](#contributing)
-  - [License](#license)
-
-## Game Concept
-
-In **Timer Gamer**, players enter their names to compete in various timed challenges. The game generates random numbers, changing quickly, and players must respond as fast as possible. The faster you react, the better your score! Each player's high scores are displayed on a **real-time leaderboard**, making every challenge even more competitive. ⏱️
-
-### Game Mechanics
-
-- **Username Setup**: Players enter their names to track scores. 📝
-- **Random Number Challenges**: React to rapidly changing numbers within a specific time. 🔢
-- **Leaderboards**: Compete to top the high score leaderboard. 🏆
+A fast-paced reflexes game built with React and Cloudflare infrastructure.
 
 ## Tech Stack
 
-### Frontend
+- **Frontend**: React + TanStack Router/Query + Vite + Tailwind CSS
+- **Backend**: Hono + Cloudflare Workers + D1 (SQLite) + KV Cache
+- **Database**: Drizzle ORM
+- **Deployment**: Cloudflare Pages & Workers
 
-- **React**: For building the user interface. ⚛️
-- **TypeScript**: To maintain type safety and enhance development. 💻
-- **CSS3**: Custom styling and animations for a smooth user experience. 🎨
-- **Vercel**: Hosting the frontend for easy deployment. 🚀
-
-### Backend
-
-- **Node.js**: For building scalable, server-side logic. 🌐
-- **Express**: A minimal framework for API creation and routing. 🛠️
-- **Prisma**: ORM for managing the database and migrations. 📊
-- **Render**: Backend deployment for fast, scalable hosting. 📦
-
-## Features
-
-- **Dynamic Gameplay**: Players respond to fast-changing random numbers. 🎲
-- **Player Profiles**: Track player scores with username input. 👤
-- **Real-time Leaderboards**: Compete and track your scores against others. 📈
-- **Engaging UX**: Includes animations and sound effects for a more immersive experience. 🎶
-
-## Installation
+## Quick Start
 
 ### Prerequisites
 
-- **Node.js** (v14 or higher) 📦
-- **npm** (Node package manager) 📜
+- Node.js >= 20
+- pnpm >= 9.12.0
+- Cloudflare account
 
-### Clone the Repository
+### Setup
 
 ```bash
-git clone https://github.com/yourusername/timer-gamer.git
-cd timer-gamer
+# Install dependencies
+pnpm install
+
+# Setup Cloudflare resources (D1 database, KV namespaces)
+wrangler d1 create timer-game-db
+wrangler kv:namespace create CACHE
+
+# Update apps/api/wrangler.toml with your database_id and namespace id
+
+# Generate and run migrations
+cd packages/db && pnpm db:generate
+cd ../../apps/api && pnpm db:migrate
+
+# Start development servers
+cd ../.. && pnpm dev
 ```
 
-### Frontend Installation
+Visit `http://localhost:5173` for the web app and `http://localhost:8787` for the API.
 
-1. Navigate to the `frontend` directory:
+## Project Structure
 
-   ```bash
-   cd frontend
-   ```
+```
+├── apps/
+│   ├── api/          # Hono API (Cloudflare Worker)
+│   └── web/          # React SPA
+├── packages/
+│   ├── db/           # Drizzle ORM schema
+│   └── types/        # Shared TypeScript types
+└── .github/workflows/ # CI/CD
+```
 
-2. Install dependencies:
+## Scripts
 
-   ```bash
-   npm install
-   ```
+```bash
+pnpm dev          # Run all apps
+pnpm build        # Build all packages
+pnpm lint         # Lint code
+pnpm format       # Format code with Prettier
+pnpm type-check   # Type check
+pnpm deploy       # Deploy to Cloudflare
+```
 
-3. Start the development server:
+## Git Hooks
 
-   ```bash
-   npm start
-   ```
+Pre-commit hooks automatically run on every commit to:
 
-### Backend Installation
+- ✨ Format code with Prettier
+- 🔍 Lint with ESLint (auto-fix issues)
 
-1. Navigate to the `backend` directory:
+Type checking is done in CI/CD for faster commits. See [HOOKS.md](./HOOKS.md) for details.
 
-   ```bash
-   cd backend
-   ```
+## Game Challenges
 
-2. Install dependencies:
+- **Quick Reflex** (1s)
+- **Speed Test** (5s)
+- **Endurance** (10s)
+- **Focus Mode** (15s)
+- **Ultimate Challenge** (30s)
 
-   ```bash
-   npm install
-   ```
-
-3. Set up the database and migrations using Prisma:
-
-   ```bash
-   npx prisma migrate dev --name init
-   npx prisma generate
-   ```
-
-4. Start the server:
-
-   ```bash
-   npm run start
-   ```
-
-## Usage
-
-1. Open your browser and navigate to `http://localhost:5173` for the frontend. 🌍
-2. Enter your name to begin playing and tracking your scores. 🕹️
-3. Choose from different challenges, improve your scores, and compete on the leaderboard! 🏅
-
-## API Reference
-
-### Base URL
-
-`https://timer-gamer-1.onrender.com/api`
-
-### Endpoints
-
-- **GET /users/leaderboard/:timerKeyScore**
-  - Retrieves the leaderboard for the specified timer challenge.
-  - **Parameters**: 
-    - `timerKeyScore`: The key representing the timer (e.g., `timer1Score`). 📊
-
-## Contributing
-
-We welcome contributions to **Timer Gamer**! To contribute:
-
-1. Fork the repository. 🍴
-2. Create a new branch for your feature or fix. 🌿
-3. Make your changes and commit them. 💻
-4. Push your branch to your forked repository. 🚀
-5. Create a pull request to the main repository. 🔄
+Stop the timer as close to 0ms remaining for max points (100)!
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details. 📜
-
+MIT
