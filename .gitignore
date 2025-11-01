@@ -7,7 +7,6 @@ build
 .env
 .env.local
 *.log
-pnpm-lock.yaml
 .DS_Store
 coverage
 .vscode
