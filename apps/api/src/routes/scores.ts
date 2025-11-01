@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { eq, desc } from "drizzle-orm";
-import { createDb, users, scores } from "@timer-game/db";
+import { createDb, scores } from "@timer-game/db";
 import type { UpdateScoreRequest, UpdateScoreResponse, LeaderboardEntry } from "@timer-game/types";
 import type { Env } from "../lib/env";
 import { KVCache } from "../lib/kv";
